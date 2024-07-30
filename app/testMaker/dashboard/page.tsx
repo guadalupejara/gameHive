@@ -1,10 +1,12 @@
 'use client'
 import React from 'react'
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
-  // Function to handle button click
+    const router = useRouter();
   const handleCreateQuiz = () => {
     console.log("Make a quiz");
+    router.push('/testMaker/createQuiz');
   };
 
   return (

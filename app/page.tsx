@@ -1,14 +1,16 @@
 'use client'
 import React from 'react'
-import Button from '../app/components/commonComponents/button';  // Adjust the import path based on your project structure
+import Button from '../app/components/commonComponents/button';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  // Function to handle button clicks
+  const router = useRouter();
   const handleClick = (buttonType: 'testTaker' | 'testMaker') => {
     if (buttonType === 'testTaker') {
       console.log("I'm a Test Taker");
     } else if (buttonType === 'testMaker') {
       console.log("I'm a Test Maker");
+      router.push('/testMaker/dashboard');
     }
   };
 

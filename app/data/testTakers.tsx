@@ -7,10 +7,13 @@ export interface TestTaker {
   }
   
   export const testTakers: TestTaker[] = [
-    { id: 1, name: 'Alice', score: 0 },
+    { id: 1, name: 'Alice', score: 100 },
     { id: 2, name: 'Bob', score: 0 },
-    { id: 3, name: 'Charlie', score: 0 },
-    { id: 4, name: 'David', score: 0 },
-    { id: 5, name: 'Eve', score: 0 },
+    { id: 3, name: 'Charlie', score: 200 },
+    { id: 4, name: 'David', score: 300 },
+    { id: 5, name: 'Eve', score: 100 },
+    
   ];
+  // export const testTakers: TestTaker[] = [
+  // ];
   

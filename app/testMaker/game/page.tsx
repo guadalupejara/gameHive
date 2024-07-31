@@ -1,0 +1,87 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import Button from '@/app/components/commonComponents/button';
+import BarChart from '@/app/components/barChart';
+import { mockGameData, Card } from '@/app/data/sampleGame';
+import { testTakers, TestTaker } from '@/app/data/testTakers';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const Game: React.FC = () => {
+  const [questions, setQuestions] = useState<Card[]>(mockGameData);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [timer, setTimer] = useState(30);
+  const [testTakersData, setTestTakersData] = useState<TestTaker[]>(testTakers);
+  const [currentScores, setCurrentScores] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      setTimer((prev) => {
+        if (prev === 1) {
+          clearInterval(countdown);
+          handleTimerEnd();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, [currentQuestionIndex]);
+
+  const handleTimerEnd = () => {
+    // Logic to handle timer end, e.g., calculate scores
+    // Update currentScores
+  };
+
+  const handleNextQuestion = () => {
+    setCurrentQuestionIndex((prev) => prev + 1);
+    setTimer(30); // Reset timer for next question
+  };
+
+  const currentQuestion = questions[currentQuestionIndex];
+
+  // Memoize chart labels and data
+  const labels = useMemo(() => testTakersData.map(taker => taker.name), [testTakersData]);
+  const data = useMemo(() => testTakersData.map(taker => taker.score), [testTakersData]);
+
+  return (
+    <main className="p-4">
+        <div className= "flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold mb-8">GameHive: {questions[0].quizName} is playing!</h1>
+      <div className="mb-4 flex items-center space-x-4">
+  <div className="text-lg font-semibold">Timer: {timer}s</div>
+  <div className="text-lg font-semibold">
+    Question {currentQuestionIndex + 1} / {questions.length}
+  </div>
+</div>
+
+      </div>
+      <div className="flex mb-4 gap-4">
+        <div className="flex-1" style={{ height: '300px' }}>
+          <BarChart labels={labels} data={data} />
+        </div>
+        <div className="flex-1 border p-4 rounded-md shadow-md">
+          <h2 className="text-xl font-semibold mb-2">{currentQuestion?.question}</h2>
+          <ul>
+            {currentQuestion?.answers.map((answer, index) => (
+              <li
+                key={index}
+                className={`p-2 border ${index === currentQuestion.correctAnswer ? 'border-green-500' : 'border-gray-300'}`}
+              >
+                {answer}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <Button onClick={handleNextQuestion} label="Next Question" className="mt-4" />
+    </main>
+  );
+};
+
+export default Game;
+

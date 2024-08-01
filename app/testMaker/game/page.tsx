@@ -1,23 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import Button from '@/app/components/commonComponents/button';
 import BarChart from '@/app/components/barChart';
-import { mockGameData, Card } from '@/app/data/sampleGame';
+import { useQuiz } from '@/app/context/QuizContext';
 import { testTakers, TestTaker } from '@/app/data/testTakers';
 import { useRouter } from 'next/navigation';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Game: React.FC = () => {
-  const [questions, setQuestions] = useState<Card[]>(mockGameData);
+  const { cards } = useQuiz();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timer, setTimer] = useState(30);
   const [testTakersData, setTestTakersData] = useState<TestTaker[]>(testTakers);
   const [currentScores, setCurrentScores] = useState<Record<number, number>>({});
   const router = useRouter();
+
   useEffect(() => {
     const countdown = setInterval(() => {
       setTimer((prev) => {
@@ -37,34 +39,31 @@ const Game: React.FC = () => {
     // Logic to handle timer end, e.g., calculate scores
     // Update currentScores
   };
-  const handleResults = () => {
-    router.push('/scores');
-  };
-  const handleCancel = () => {
-    router.push('/testMaker/dashboard');
-  };
+
   const handleNextQuestion = () => {
     setCurrentQuestionIndex((prev) => prev + 1);
     setTimer(30); // Reset timer for next question
   };
 
-  const currentQuestion = questions[currentQuestionIndex];
+  const handleResults = () => {
+    router.push('/scores');
+  };
 
+  const currentQuestion = cards[currentQuestionIndex];
 
   const labels = useMemo(() => testTakersData.map(taker => taker.name), [testTakersData]);
   const data = useMemo(() => testTakersData.map(taker => taker.score), [testTakersData]);
 
   return (
     <main className="p-4">
-        <div className= "flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-8">GameHive: {questions[0].quizName} is playing!</h1>
-      <div className="mb-4 flex items-center space-x-4">
-  <div className="text-lg font-semibold">Timer: {timer}s</div>
-  <div className="text-lg font-semibold">
-    Question {currentQuestionIndex + 1} / {questions.length}
-  </div>
-</div>
-
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-4xl font-bold mb-8">GameHive: {cards[0]?.quizName} is playing!</h1>
+        <div className="mb-4 flex items-center space-x-4">
+          <div className="text-lg font-semibold">Timer: {timer}s</div>
+          <div className="text-lg font-semibold">
+            Question {currentQuestionIndex + 1} / {cards.length}
+          </div>
+        </div>
       </div>
       <div className="flex mb-4 gap-4">
         <div className="flex-1" style={{ height: '300px' }}>
@@ -84,18 +83,10 @@ const Game: React.FC = () => {
           </ul>
         </div>
       </div>
-      <Button onClick={handleCancel} label="Cancel" className="mt-4 mx-1 bg-gray-300" />
-      <Button
-  onClick={handleNextQuestion}
-  label="Next Question"
-  className="mt-4 mx-1"
-  disabled={currentQuestionIndex >= questions.length - 1}
-/> 
-<Button onClick={handleResults} label="See Results" className="mt-4 mx-1" />
-
+      <Button onClick={handleNextQuestion} label="Next Question" className="mt-4 mx-1" disabled={currentQuestionIndex >= cards.length - 1} />
+      <Button onClick={handleResults} label="See Results" className="mt-4 mx-1" />
     </main>
   );
 };
 
 export default Game;
-

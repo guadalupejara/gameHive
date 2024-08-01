@@ -1,27 +1,33 @@
+'use client';
 
-'use client'
 import React, { useState, useEffect } from 'react';
 
 interface QuizCardProps {
-  onAdd: () => void;
+  index: number;
   onDelete: () => void;
   onUpdate: (index: number, question: string, answers: string[], correctAnswer: number | null) => void;
-  index: number;
 }
 
-const QuizCard: React.FC<QuizCardProps> = ({ onAdd, onDelete, onUpdate, index }) => {
+const QuizCard: React.FC<QuizCardProps> = ({ index, onDelete, onUpdate }) => {
   const [question, setQuestion] = useState('');
   const [answers, setAnswers] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
 
-  const handleAnswerChange = (index: number, value: string) => {
+  const handleAnswerChange = (answerIndex: number, value: string) => {
     const updatedAnswers = [...answers];
-    updatedAnswers[index] = value;
+    updatedAnswers[answerIndex] = value;
     setAnswers(updatedAnswers);
+    onUpdate(index, question, updatedAnswers, correctAnswer);
   };
 
-  const handleCorrectAnswerChange = (index: number) => {
-    setCorrectAnswer(index);
+  const handleCorrectAnswerChange = (answerIndex: number) => {
+    setCorrectAnswer(answerIndex);
+    onUpdate(index, question, answers, answerIndex);
+  };
+
+  const handleQuestionChange = (value: string) => {
+    setQuestion(value);
+    onUpdate(index, value, answers, correctAnswer);
   };
 
   // Debounce the onUpdate call to avoid too many updates in quick succession
@@ -42,19 +48,13 @@ const QuizCard: React.FC<QuizCardProps> = ({ onAdd, onDelete, onUpdate, index })
         >
           <i className="fa-solid fa-trash-can">Trash</i>
         </button>
-        <button
-          className="text-blue-500 hover:text-blue-700"
-          onClick={onAdd}
-        >
-          <i className="fa-regular fa-square-plus">Add</i>
-        </button>
       </div>
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Question:</label>
         <input
           type="text"
           value={question}
-          onChange={(e) => setQuestion(e.target.value)}
+          onChange={(e) => handleQuestionChange(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         />
       </div>

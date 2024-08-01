@@ -38,6 +38,7 @@ const Lobby: React.FC = () => {
   const startGame = () => {
     // Logic to start the game
     console.log('Starting game with code:', gameCode);
+    router.push('/testMaker/game');
   };
 
   const cancelGame = () => {

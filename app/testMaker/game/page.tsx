@@ -7,6 +7,7 @@ import Button from '@/app/components/commonComponents/button';
 import BarChart from '@/app/components/barChart';
 import { mockGameData, Card } from '@/app/data/sampleGame';
 import { testTakers, TestTaker } from '@/app/data/testTakers';
+import { useRouter } from 'next/navigation';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -16,7 +17,7 @@ const Game: React.FC = () => {
   const [timer, setTimer] = useState(30);
   const [testTakersData, setTestTakersData] = useState<TestTaker[]>(testTakers);
   const [currentScores, setCurrentScores] = useState<Record<number, number>>({});
-
+  const router = useRouter();
   useEffect(() => {
     const countdown = setInterval(() => {
       setTimer((prev) => {
@@ -36,7 +37,12 @@ const Game: React.FC = () => {
     // Logic to handle timer end, e.g., calculate scores
     // Update currentScores
   };
-
+  const handleResults = () => {
+    router.push('/scores');
+  };
+  const handleCancel = () => {
+    router.push('/testMaker/dashboard');
+  };
   const handleNextQuestion = () => {
     setCurrentQuestionIndex((prev) => prev + 1);
     setTimer(30); // Reset timer for next question
@@ -44,7 +50,7 @@ const Game: React.FC = () => {
 
   const currentQuestion = questions[currentQuestionIndex];
 
-  // Memoize chart labels and data
+
   const labels = useMemo(() => testTakersData.map(taker => taker.name), [testTakersData]);
   const data = useMemo(() => testTakersData.map(taker => taker.score), [testTakersData]);
 
@@ -78,7 +84,15 @@ const Game: React.FC = () => {
           </ul>
         </div>
       </div>
-      <Button onClick={handleNextQuestion} label="Next Question" className="mt-4" />
+      <Button onClick={handleCancel} label="Cancel" className="mt-4 mx-1 bg-gray-300" />
+      <Button
+  onClick={handleNextQuestion}
+  label="Next Question"
+  className="mt-4 mx-1"
+  disabled={currentQuestionIndex >= questions.length - 1}
+/> 
+<Button onClick={handleResults} label="See Results" className="mt-4 mx-1" />
+
     </main>
   );
 };

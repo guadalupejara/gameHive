@@ -8,6 +8,7 @@ export default function Home() {
   const handleClick = (buttonType: 'testTaker' | 'testMaker') => {
     if (buttonType === 'testTaker') {
       console.log("I'm a Test Taker");
+      router.push('/testTaker/login');
     } else if (buttonType === 'testMaker') {
       console.log("I'm a Test Maker");
       router.push('/testMaker/dashboard');

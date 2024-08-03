@@ -1,5 +1,6 @@
 
 import { QuizProvider } from '@/app/context/QuizContext';
+import {TestTakerProvider} from '@/app/context/testTakerContext'
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <QuizProvider>
+          <TestTakerProvider>
           {children}
+          </TestTakerProvider>
         </QuizProvider>
       </body>
     </html>

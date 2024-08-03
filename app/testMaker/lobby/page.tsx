@@ -26,23 +26,20 @@ const Lobby: React.FC = () => {
   const [takers, setTakers] = useState<TestTaker[]>([]);
 
   useEffect(() => {
-    // Fetch existing codes from backend to ensure uniqueness
+   
     const existingCodes: string[] = []; 
 
-    // Generate a unique alphanumeric code
     const code = generateUniqueCode(existingCodes);
     setGameCode(code);
     setTakers(testTakers);
   }, []);
 
   const startGame = () => {
-    // Logic to start the game
     console.log('Starting game with code:', gameCode);
     router.push('/testMaker/game');
   };
 
   const cancelGame = () => {
-    // Route to the dashboard
     router.push('/testMaker/dashboard');
   };
 

@@ -42,7 +42,7 @@ const Game: React.FC = () => {
 
   const handleNextQuestion = () => {
     setCurrentQuestionIndex((prev) => prev + 1);
-    setTimer(30); // Reset timer for next question
+    setTimer(30); 
   };
 
   const handleResults = () => {

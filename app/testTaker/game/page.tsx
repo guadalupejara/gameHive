@@ -117,7 +117,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, mockGameData } from '@/app/data/sampleGame'; // Import the Card interface
+import { Card, mockGameData } from '@/app/data/sampleGame';
 import { useTestTaker } from '@/app/context/testTakerContext';
 
 const Game: React.FC = () => {
@@ -129,22 +129,26 @@ const Game: React.FC = () => {
   const [score, setScore] = useState(currentUser?.score || 0);
   const router = useRouter();
 
-  // Use sample data
   const cards: Card[] = mockGameData;
 
   useEffect(() => {
-    const countdown = setInterval(() => {
-      setTimer((prev) => {
-        if (prev === 1) {
-          clearInterval(countdown);
-          handleTimerEnd();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    let countdown: NodeJS.Timeout;
+
+    if (timer > 0) {
+      countdown = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else {
+      handleTimerEnd();
+    }
 
     return () => clearInterval(countdown);
+  }, [timer]);
+
+  useEffect(() => {
+    setTimer(30);
+    setUserAnswer(null);
+    setAnswerFeedback(null);
   }, [currentQuestionIndex]);
 
   const handleTimerEnd = () => {
@@ -164,10 +168,10 @@ const Game: React.FC = () => {
 
     setTimeout(() => {
       if (currentQuestionIndex < cards.length - 1) {
-        setCurrentQuestionIndex((prev) => prev + 1);
-        setTimer(30);
-        setUserAnswer(null);
-        setAnswerFeedback(null);
+        setCurrentQuestionIndex((prev) => {
+          console.log('Incrementing question index from', prev, 'to', prev + 1);
+          return prev + 1;
+        });
       } else {
         handleResults();
       }
@@ -179,7 +183,7 @@ const Game: React.FC = () => {
   };
 
   const handleResults = () => {
-    router.push('/testTaker/results');
+    router.push('/scores');
   };
 
   const currentQuestion = cards[currentQuestionIndex];

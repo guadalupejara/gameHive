@@ -37,7 +37,7 @@ const CreateQuiz: React.FC = () => {
 
   const handleQuizNameChange = (newQuizName: string) => {
     setCards((prevCards) => {
-      if (prevCards.length === 0) return prevCards; // If no cards, do nothing
+      if (prevCards.length === 0) return prevCards; 
 
       const updatedCards = prevCards.map(card => ({
         ...card,

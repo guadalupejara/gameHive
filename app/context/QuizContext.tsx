@@ -5,6 +5,7 @@ import React, { createContext, useState, useContext } from 'react';
 
 interface Card {
   id: number;
+  quizName:string;
   question: string;
   answers: string[];
   correctAnswer: number | null;

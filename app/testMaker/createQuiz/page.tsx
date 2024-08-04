@@ -11,7 +11,6 @@ import ScrollToTopButton from '@/app/components/commonComponents/scrollToTop';
 const CreateQuiz: React.FC = () => {
   const { cards, setCards } = useQuiz();
 
-  // Debug: Check the current state of cards
   console.log("Current cards:", cards);
 
   const handleAddCard = () => {

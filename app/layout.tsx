@@ -1,6 +1,7 @@
 
 import { QuizProvider } from '@/app/context/QuizContext';
 import {TestTakerProvider} from '@/app/context/testTakerContext'
+import { GameStartProvider } from '@/app/context/gameStartContext';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -21,7 +22,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <QuizProvider>
           <TestTakerProvider>
-          {children}
+          <GameStartProvider>
+              {children}
+            </GameStartProvider>
           </TestTakerProvider>
         </QuizProvider>
       </body>

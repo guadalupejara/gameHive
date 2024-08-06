@@ -7,7 +7,13 @@ For this project and the sake of respecting the properiaty aspect of the product
 
 Per the user studies, users expressed an interest in anonymity from peers and those in upper managment as well as stakeholders expressing the need for a mobile friendly design. These features are implemented utilizing Tailwind CSS Mobile first design as well as allowing the use for setting user_name per the discretion of the testTaker. Currently a work in progress, much like in the residency, I focused on the front end and creating one complete user flow and having data being stored through React's useContext to globalize the states. The testMaker user flow allows for the creation of the quiz through quiz cards which displays in the Game portion of the quiz application. Whereas the testTaker will be able to insert game access code and set their user name. Bother testTaker and testMaker will see their lobbies populate with users logged in and await for the testMaker to intiated the game. testTakers will receive the questions with ability to select an answer within a 30 second time frame. At the end of the game both testTaker and testMaker will see a leadership board.
 
-Next Steps: Connecting the backend to the front end. 
+Next Steps: 
+
+-Connecting the backend to the front end.
+
+-Apply Designs and establish theme.
+
+-Apply Responsive design through breakpoints.
 
 ![Home Page](Images/home.png)
 

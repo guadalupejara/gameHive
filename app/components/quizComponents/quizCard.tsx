@@ -1,54 +1,136 @@
 'use client';
 
+// import React, { useState, useEffect } from 'react';
+
+// interface QuizCardProps {
+//   index: number;
+//   onDelete: () => void;
+//   onUpdate: (index: number, question: string, answers: string[], correctAnswer: number | null) => void;
+// }
+
+// const QuizCard: React.FC<QuizCardProps> = ({ index, onDelete, onUpdate }) => {
+//   const [question, setQuestion] = useState('');
+//   const [answers, setAnswers] = useState(['', '', '', '']);
+//   const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
+
+//   const handleAnswerChange = (answerIndex: number, value: string) => {
+//     const updatedAnswers = [...answers];
+//     updatedAnswers[answerIndex] = value;
+//     setAnswers(updatedAnswers);
+//     onUpdate(index, question, updatedAnswers, correctAnswer);
+//   };
+
+//   const handleCorrectAnswerChange = (answerIndex: number) => {
+//     setCorrectAnswer(answerIndex);
+//     onUpdate(index, question, answers, answerIndex);
+//   };
+
+//   const handleQuestionChange = (value: string) => {
+//     setQuestion(value);
+//     onUpdate(index, value, answers, correctAnswer);
+//   };
+
+//   // Debounce the onUpdate call to avoid too many updates in quick succession
+//   useEffect(() => {
+//     const timeoutId = setTimeout(() => {
+//       onUpdate(index, question, answers, correctAnswer);
+//     }, 300); // Delay to reduce frequency of updates
+
+//     return () => clearTimeout(timeoutId);
+//   }, [question, answers, correctAnswer]);
+
+//   return (
+//     <div className="relative bg-white p-6 rounded-lg shadow-lg w-[66vw] mx-auto mb-3">
+//       <div className="absolute top-2 right-2 flex space-x-2">
+//         <button
+//           className="text-red-500 hover:text-red-700"
+//           onClick={onDelete}
+//         >
+//           <i className="fa-solid fa-trash-can">Trash</i>
+//         </button>
+//       </div>
+//       <div className="mb-4">
+//         <label className="block text-sm font-medium mb-1">Question:</label>
+//         <input
+//           type="text"
+//           value={question}
+//           onChange={(e) => handleQuestionChange(e.target.value)}
+//           className="w-full p-2 border border-gray-300 rounded"
+//         />
+//       </div>
+
+//       {answers.map((answer, answerIndex) => (
+//         <div key={answerIndex} className="mb-4">
+//           <div className="flex items-center mb-2">
+//             <input
+//               type="radio"
+//               name={`correctAnswer-${index}`}
+//               checked={correctAnswer === answerIndex}
+//               onChange={() => handleCorrectAnswerChange(answerIndex)}
+//               className="mr-2"
+//             />
+//             <input
+//               type="text"
+//               value={answer}
+//               onChange={(e) => handleAnswerChange(answerIndex, e.target.value)}
+//               className={`w-full p-2 border rounded ${correctAnswer === answerIndex ? 'border-green-500' : 'border-gray-300'}`}
+//               placeholder={`Answer ${answerIndex + 1}`}
+//             />
+//           </div>
+//           {correctAnswer === answerIndex && (
+//             <p className="text-green-500 text-sm ml-8">Correct Answer</p>
+//           )}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default QuizCard;
+
 import React, { useState, useEffect } from 'react';
+import { Card } from '@/app/types/testMaker_types';
 
 interface QuizCardProps {
-  index: number;
-  onDelete: () => void;
-  onUpdate: (index: number, question: string, answers: string[], correctAnswer: number | null) => void;
+  quizIndex: number;
+  cardIndex: number;
+  card: Card;
+  onDeleteCard: () => void;
+  onUpdateCard: (updatedCard: Card) => void;
 }
 
-const QuizCard: React.FC<QuizCardProps> = ({ index, onDelete, onUpdate }) => {
-  const [question, setQuestion] = useState('');
-  const [answers, setAnswers] = useState(['', '', '', '']);
-  const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
+const QuizCard: React.FC<QuizCardProps> = ({ cardIndex, card, onDeleteCard, onUpdateCard }) => {
+  const [question, setQuestion] = useState(card.question);
+  const [answers, setAnswers] = useState(card.answers);
+  const [correctAnswer, setCorrectAnswer] = useState(card.correctAnswer);
+
+  useEffect(() => {
+    // Notify parent component about the card updates
+    onUpdateCard({ question, answers, correctAnswer });
+  }, [question, answers, correctAnswer]);
 
   const handleAnswerChange = (answerIndex: number, value: string) => {
     const updatedAnswers = [...answers];
     updatedAnswers[answerIndex] = value;
     setAnswers(updatedAnswers);
-    onUpdate(index, question, updatedAnswers, correctAnswer);
   };
 
   const handleCorrectAnswerChange = (answerIndex: number) => {
     setCorrectAnswer(answerIndex);
-    onUpdate(index, question, answers, answerIndex);
   };
 
   const handleQuestionChange = (value: string) => {
     setQuestion(value);
-    onUpdate(index, value, answers, correctAnswer);
   };
 
-  // Debounce the onUpdate call to avoid too many updates in quick succession
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      onUpdate(index, question, answers, correctAnswer);
-    }, 300); // Delay to reduce frequency of updates
-
-    return () => clearTimeout(timeoutId);
-  }, [question, answers, correctAnswer]);
-
   return (
-    <div className="relative bg-white p-6 rounded-lg shadow-lg w-[66vw] mx-auto mb-3">
-      <div className="absolute top-2 right-2 flex space-x-2">
-        <button
-          className="text-red-500 hover:text-red-700"
-          onClick={onDelete}
-        >
-          <i className="fa-solid fa-trash-can">Trash</i>
-        </button>
-      </div>
+    <div className="relative bg-white p-6 rounded-lg shadow-lg mb-4">
+      <button
+        onClick={onDeleteCard}
+        className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700"
+      >
+        <i className="fa-solid fa-trash-can">Trash</i>
+      </button>
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Question:</label>
         <input
@@ -58,27 +140,24 @@ const QuizCard: React.FC<QuizCardProps> = ({ index, onDelete, onUpdate }) => {
           className="w-full p-2 border border-gray-300 rounded"
         />
       </div>
-
       {answers.map((answer, answerIndex) => (
-        <div key={answerIndex} className="mb-4">
-          <div className="flex items-center mb-2">
-            <input
-              type="radio"
-              name={`correctAnswer-${index}`}
-              checked={correctAnswer === answerIndex}
-              onChange={() => handleCorrectAnswerChange(answerIndex)}
-              className="mr-2"
-            />
-            <input
-              type="text"
-              value={answer}
-              onChange={(e) => handleAnswerChange(answerIndex, e.target.value)}
-              className={`w-full p-2 border rounded ${correctAnswer === answerIndex ? 'border-green-500' : 'border-gray-300'}`}
-              placeholder={`Answer ${answerIndex + 1}`}
-            />
-          </div>
+        <div key={answerIndex} className="mb-4 flex items-center">
+          <input
+            type="radio"
+            name={`correctAnswer-${cardIndex}`}
+            checked={correctAnswer === answerIndex}
+            onChange={() => handleCorrectAnswerChange(answerIndex)}
+            className="mr-2"
+          />
+          <input
+            type="text"
+            value={answer}
+            onChange={(e) => handleAnswerChange(answerIndex, e.target.value)}
+            className={`w-full p-2 border rounded ${correctAnswer === answerIndex ? 'border-green-500' : 'border-gray-300'}`}
+            placeholder={`Answer ${answerIndex + 1}`}
+          />
           {correctAnswer === answerIndex && (
-            <p className="text-green-500 text-sm ml-8">Correct Answer</p>
+            <p className="text-green-500 text-sm ml-2">Correct Answer</p>
           )}
         </div>
       ))}
@@ -87,4 +166,3 @@ const QuizCard: React.FC<QuizCardProps> = ({ index, onDelete, onUpdate }) => {
 };
 
 export default QuizCard;
-

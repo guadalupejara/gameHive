@@ -17,6 +17,7 @@ const CreateQuiz: React.FC = () => {
     setQuiz({
       quizName: '',
       id: '',
+      db_doc_id:'',
       card: [{ question: '', answers: ['', '', '', ''], correctAnswer: null }]
     });
   };
@@ -27,6 +28,7 @@ const CreateQuiz: React.FC = () => {
         return {
           id: "1",
           quizName: '',
+          db_doc_id:'',
           card: [{ question: '', answers: ['', '', '', ''], correctAnswer: null }],
         };
       }
@@ -70,12 +72,18 @@ const CreateQuiz: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); 
 
-    console.log("Submit Quiz", quiz);
-    addQuiz(quiz);
-    router.push('/testMaker/lobby');
+    try {
+      if (quiz) {
+        const docId = await addQuiz(quiz);
+        setQuiz((prevQuiz) => prevQuiz ? { ...prevQuiz, db_doc_id: docId } : null);
+        router.push('/testMaker/lobby');
+      }
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+    }
   };
 
   const handleCancel = () => {

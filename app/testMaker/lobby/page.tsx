@@ -5,6 +5,7 @@ import { testTakers, TestTaker } from '@/app/data/testTakers';
 import Button from '@/app/components/commonComponents/button';
 import LobbyBox from '@/app/components/commonComponents/lobbyBox';
 import { useQuiz } from '@/app/context/QuizContext';
+import { updateQuiz } from '@/lib';
 
 const Lobby: React.FC = () => {
   const router = useRouter(); 
@@ -34,6 +35,7 @@ const Lobby: React.FC = () => {
       if (!prevQuiz) {
         return {
           id: code, 
+          db_doc_id:'',
           quizName: '',
           card: []
         };
@@ -50,6 +52,7 @@ const Lobby: React.FC = () => {
   const startGame = () => {
     console.log('Starting game with code:', quiz?.id);
     console.log(quiz)
+    updateQuiz(quiz?.db_doc_id, quiz)
     router.push('/testMaker/game');
   };
 

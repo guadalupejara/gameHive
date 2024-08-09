@@ -4,16 +4,21 @@
 import React, { createContext, useState, useContext } from 'react';
 
 interface Card {
-  id: number;
-  quizName:string;
   question: string;
   answers: string[];
   correctAnswer: number | null;
 }
 
+interface Quiz {
+  id: string;
+  db_doc_id: string;
+  quizName: string;
+  card: Card[];
+}
+
 interface QuizContextType {
-  cards: Card[];
-  setCards: React.Dispatch<React.SetStateAction<Card[]>>;
+  quiz: Quiz | null;
+  setQuiz: React.Dispatch<React.SetStateAction<Quiz | null>>;
   gameCode: string;
   setGameCode: React.Dispatch<React.SetStateAction<string>>;
   currentGameCodes: string[];
@@ -32,7 +37,7 @@ export const useQuiz = () => {
 };
 
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cards, setCards] = useState<Card[]>([]);
+  const [quiz, setQuiz] = useState<Quiz | null>(null); 
   const [gameCode, setGameCode] = useState<string>('');
   const [currentGameCodes, setCurrentGameCodes] = useState<string[]>([]);
 
@@ -45,9 +50,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <QuizContext.Provider value={{ cards, setCards, gameCode, setGameCode, currentGameCodes, addGameCode, validateGameCode }}>
+    <QuizContext.Provider value={{ quiz, setQuiz, gameCode, setGameCode, currentGameCodes, addGameCode, validateGameCode }}>
       {children}
     </QuizContext.Provider>
   );
 };
-

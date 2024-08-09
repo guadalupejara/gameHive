@@ -1,9 +1,15 @@
 'use client'
-import React from 'react'
+// import React from 'react'
 import Button from '../app/components/commonComponents/button';
 import { useRouter } from 'next/navigation';
+//
+import React,{ useEffect } from 'react';
+import { uploadData } from '../lib/index';
 
 export default function Home() {
+  useEffect(() => {
+    uploadData();
+  }, []);
   const router = useRouter();
   const handleClick = (buttonType: 'testTaker' | 'testMaker') => {
     if (buttonType === 'testTaker') {

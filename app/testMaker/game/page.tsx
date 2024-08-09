@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -13,7 +12,7 @@ import { useRouter } from 'next/navigation';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Game: React.FC = () => {
-  const { cards } = useQuiz();
+  const { quiz } = useQuiz();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timer, setTimer] = useState(30);
   const [testTakersData, setTestTakersData] = useState<TestTaker[]>(testTakers);
@@ -41,15 +40,17 @@ const Game: React.FC = () => {
   };
 
   const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prev) => prev + 1);
-    setTimer(30); 
+    if (quiz && currentQuestionIndex < (quiz.card.length - 1)) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+      setTimer(30);
+    }
   };
 
   const handleResults = () => {
     router.push('/scores');
   };
 
-  const currentQuestion = cards[currentQuestionIndex];
+  const currentCard = quiz?.card[currentQuestionIndex];
 
   const labels = useMemo(() => testTakersData.map(taker => taker.name), [testTakersData]);
   const data = useMemo(() => testTakersData.map(taker => taker.score), [testTakersData]);
@@ -57,11 +58,11 @@ const Game: React.FC = () => {
   return (
     <main className="p-4">
       <div className="flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold mb-8">GameHive: {cards[0]?.quizName} is playing!</h1>
+        <h1 className="text-4xl font-bold mb-8">GameHive: {quiz?.quizName} is playing!</h1>
         <div className="mb-4 flex items-center space-x-4">
           <div className="text-lg font-semibold">Timer: {timer}s</div>
           <div className="text-lg font-semibold">
-            Question {currentQuestionIndex + 1} / {cards.length}
+            Question {currentQuestionIndex + 1} / {quiz?.card.length}
           </div>
         </div>
       </div>
@@ -70,12 +71,12 @@ const Game: React.FC = () => {
           <BarChart labels={labels} data={data} />
         </div>
         <div className="flex-1 border p-4 rounded-md shadow-md">
-          <h2 className="text-xl font-semibold mb-2">{currentQuestion?.question}</h2>
+          <h2 className="text-xl font-semibold mb-2">{currentCard?.question}</h2>
           <ul>
-            {currentQuestion?.answers.map((answer, index) => (
+            {currentCard?.answers.map((answer, index) => (
               <li
                 key={index}
-                className={`p-2 border ${index === currentQuestion.correctAnswer ? 'border-green-500' : 'border-gray-300'}`}
+                className={`p-2 border ${index === currentCard.correctAnswer ? 'border-green-500' : 'border-gray-300'}`}
               >
                 {answer}
               </li>
@@ -83,8 +84,17 @@ const Game: React.FC = () => {
           </ul>
         </div>
       </div>
-      <Button onClick={handleNextQuestion} label="Next Question" className="mt-4 mx-1" disabled={currentQuestionIndex >= cards.length - 1} />
-      <Button onClick={handleResults} label="See Results" className="mt-4 mx-1" />
+      <Button 
+        onClick={handleNextQuestion} 
+        label="Next Question" 
+        className="mt-4 mx-1" 
+        disabled={currentQuestionIndex >= (quiz?.card?.length || 0) - 1} 
+      />
+      <Button 
+        onClick={handleResults} 
+        label="See Results" 
+        className="mt-4 mx-1" 
+      />
     </main>
   );
 };

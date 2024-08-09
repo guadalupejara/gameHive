@@ -9,7 +9,8 @@ export interface Card {
   
   // Define the shape of a Quiz object
   export interface Quiz {
-    id: number;
+    id: string;
+    db_doc_id:string;
     quizName: string;
     card: Card[]; // An array of Card objects
   }

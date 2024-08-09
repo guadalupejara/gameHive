@@ -4,38 +4,52 @@ import { useRouter } from 'next/navigation';
 import { testTakers, TestTaker } from '@/app/data/testTakers';
 import Button from '@/app/components/commonComponents/button';
 import LobbyBox from '@/app/components/commonComponents/lobbyBox';
-
-
-const generateUniqueCode = (existingCodes: string[]): string => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let newCode;
-
-  do {
-    newCode = '';
-    for (let i = 0; i < 4; i++) {
-      newCode += chars[Math.floor(Math.random() * chars.length)];
-    }
-  } while (existingCodes.includes(newCode));
-
-  return newCode;
-};
+import { useQuiz } from '@/app/context/QuizContext';
 
 const Lobby: React.FC = () => {
   const router = useRouter(); 
-  const [gameCode, setGameCode] = useState('');
+  const [gameCode, setgameCode] = useState('');
   const [takers, setTakers] = useState<TestTaker[]>([]);
-
+  const { quiz, setQuiz } = useQuiz();
+  const generateUniqueCode = (existingCodes: string[]): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let newCode;
+  
+    do {
+      newCode = '';
+      for (let i = 0; i < 4; i++) {
+        newCode += chars[Math.floor(Math.random() * chars.length)];
+      }
+    } while (existingCodes.includes(newCode));
+  
+    return newCode;
+  };
+  
   useEffect(() => {
    
     const existingCodes: string[] = []; 
 
     const code = generateUniqueCode(existingCodes);
-    setGameCode(code);
+    setQuiz((prevQuiz) => {
+      if (!prevQuiz) {
+        return {
+          id: code, 
+          quizName: '',
+          card: []
+        };
+      }
+      return {
+        ...prevQuiz,
+        id: code
+      };
+    });
+    setgameCode(code)
     setTakers(testTakers);
   }, []);
 
   const startGame = () => {
-    console.log('Starting game with code:', gameCode);
+    console.log('Starting game with code:', quiz?.id);
+    console.log(quiz)
     router.push('/testMaker/game');
   };
 

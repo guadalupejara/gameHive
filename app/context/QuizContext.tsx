@@ -10,7 +10,7 @@ interface Card {
 }
 
 interface Quiz {
-  id: number;
+  id: string;
   quizName: string;
   card: Card[];
 }

@@ -4,6 +4,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 interface Card {
+  uId:string;
   question: string;
   answers: string[];
   correctAnswer: number | null;
@@ -17,8 +18,8 @@ interface Quiz {
 }
 
 interface QuizContextType {
-  quiz: Quiz | null;
-  setQuiz: React.Dispatch<React.SetStateAction<Quiz | null>>;
+  quiz: Quiz;
+  setQuiz: React.Dispatch<React.SetStateAction<Quiz>>;
   gameCode: string;
   setGameCode: React.Dispatch<React.SetStateAction<string>>;
   currentGameCodes: string[];
@@ -37,7 +38,12 @@ export const useQuiz = () => {
 };
 
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [quiz, setQuiz] = useState<Quiz | null>(null); 
+  const [quiz, setQuiz] = useState<Quiz>({
+    id: '',
+    db_doc_id: '',
+    quizName: '',
+    card: [{ uId: '0', question: '', answers: ['', '', '', ''], correctAnswer: null }],
+  }); 
   const [gameCode, setGameCode] = useState<string>('');
   const [currentGameCodes, setCurrentGameCodes] = useState<string[]>([]);
 

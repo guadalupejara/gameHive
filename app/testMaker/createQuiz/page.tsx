@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuiz } from '@/app/context/QuizContext';
 import { useRouter } from 'next/navigation';
 import QuizCard from '../../components/quizComponents/quizCard';
@@ -12,29 +12,16 @@ import { addQuiz } from '@/lib';
 const CreateQuiz: React.FC = () => {
   const { quiz, setQuiz } = useQuiz();
   const router = useRouter();
-
-  const handleAddQuiz = () => {
-    setQuiz({
-      quizName: '',
-      id: '',
-      db_doc_id:'',
-      card: [{ question: '', answers: ['', '', '', ''], correctAnswer: null }]
-    });
-  };
+  const [cardCounter, setCardCounter] = useState(1);
 
   const handleAddCard = () => {
     setQuiz((prevQuiz) => {
-      if (!prevQuiz) {
-        return {
-          id: "1",
-          quizName: '',
-          db_doc_id:'',
-          card: [{ question: '', answers: ['', '', '', ''], correctAnswer: null }],
-        };
-      }
       const updatedCards = [...prevQuiz.card];
-      updatedCards.push({ question: '', answers: ['', '', '', ''], correctAnswer: null });
-  
+      const newCardId = `card_${cardCounter}`;
+      updatedCards.push({ uId: newCardId, question: '', answers: ['', '', '', ''], correctAnswer: null });
+
+      setCardCounter((prevCounter) => prevCounter + 1);
+
       return {
         ...prevQuiz,
         card: updatedCards,
@@ -43,31 +30,24 @@ const CreateQuiz: React.FC = () => {
   };
 
   const handleUpdateQuizName = (newQuizName: string) => {
-    setQuiz((prevQuiz) => {
-      if (!prevQuiz) return null;
-  
-      return {
-        ...prevQuiz,
-        quizName: newQuizName,
-      };
-    });
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      quizName: newQuizName,
+    }));
   };
 
-  const handleUpdateCard = (cardIndex: number, updatedCard: Card) => {
+  const handleUpdateCard = (uId: string, updatedCard: Card) => {
     setQuiz((prevQuiz) => {
-      if (!prevQuiz) return null;
-  
-      const updatedCards = [...prevQuiz.card];
-      updatedCards[cardIndex] = updatedCard;
+      const updatedCards = prevQuiz.card.map((card) =>
+        card.uId === uId ? updatedCard : card
+      );
       return { ...prevQuiz, card: updatedCards };
     });
   };
 
-  const handleDeleteCard = (cardIndex: number) => {
+  const handleDeleteCard = (uId: string) => {
     setQuiz((prevQuiz) => {
-      if (!prevQuiz) return null;
-  
-      const updatedCards = prevQuiz.card.filter((_, i) => i !== cardIndex);
+      const updatedCards = prevQuiz.card.filter((card) => card.uId !== uId);
       return { ...prevQuiz, card: updatedCards };
     });
   };
@@ -76,11 +56,9 @@ const CreateQuiz: React.FC = () => {
     e.preventDefault(); 
 
     try {
-      if (quiz) {
-        const docId = await addQuiz(quiz);
-        setQuiz((prevQuiz) => prevQuiz ? { ...prevQuiz, db_doc_id: docId } : null);
-        router.push('/testMaker/lobby');
-      }
+      const docId = await addQuiz(quiz);
+      setQuiz((prevQuiz) => ({ ...prevQuiz, db_doc_id: docId }));
+      router.push('/testMaker/lobby');
     } catch (error) {
       console.error("Error submitting quiz:", error);
     }
@@ -100,36 +78,25 @@ const CreateQuiz: React.FC = () => {
             <label className="block text-lg font-medium mt-6 mb-2">Quiz Name:</label>
             <input
               type="text"
-              value={quiz?.quizName || ''}
+              value={quiz.quizName}
               onChange={(e) => handleUpdateQuizName(e.target.value)}
               className="w-full md:w-3/4 lg:w-1/2 p-2 border border-gray-300 rounded mb-6"
             />
-            {quiz?.card && quiz.card.length > 0 ? (
-              quiz.card.map((card, cardIndex) => (
-                <QuizCard
-                  key={cardIndex}
-                  cardIndex={cardIndex}
-                  card={card}
-                  onDeleteCard={() => handleDeleteCard(cardIndex)}
-                  onUpdateCard={(updatedCard) => handleUpdateCard(cardIndex, updatedCard)}
-                />
-              ))
-            ) : (
-              <p>Create a Quiz by adding a new Card!</p>
-            )}
+            {quiz.card.map((card, cardIndex) => (
+              <QuizCard
+                key={card.uId}
+                cardIndex={cardIndex}
+                card={card}
+                onDeleteCard={() => handleDeleteCard(card.uId)}
+                onUpdateCard={(updatedCard) => handleUpdateCard(card.uId, updatedCard)}
+              />
+            ))}
             <Button
               label="Add New Card"
               onClick={handleAddCard} 
               className="bg-green-500 hover:bg-green-600 mt-3"
             />
           </div>
-          {quiz?.card.length === 0 && (
-            <Button
-              label="Add New Quiz"
-              onClick={handleAddQuiz}
-              className="bg-green-500 hover:bg-green-600 mt-3"
-            />
-          )}
           <div className='flex justify-center mt-6'>
             <Button
               label="Submit Quiz"
@@ -150,4 +117,3 @@ const CreateQuiz: React.FC = () => {
 };
 
 export default CreateQuiz;
-

@@ -1,5 +1,6 @@
 
 export interface Card {
+    uId:string,
     question: string;
     answers: string[];
     correctAnswer: number | null;

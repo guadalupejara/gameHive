@@ -13,10 +13,16 @@ const QuizCard: React.FC<QuizCardProps> = ({ cardIndex, card, onDeleteCard, onUp
   const [question, setQuestion] = useState(card.question);
   const [answers, setAnswers] = useState(card.answers);
   const [correctAnswer, setCorrectAnswer] = useState(card.correctAnswer);
-
   useEffect(() => {
-    onUpdateCard({ question, answers, correctAnswer });
-  }, [question, answers, correctAnswer]);
+    if (
+      question !== card.question ||
+      JSON.stringify(answers) !== JSON.stringify(card.answers) ||
+      correctAnswer !== card.correctAnswer
+    ) {
+      onUpdateCard({ uId: card.uId, question, answers, correctAnswer });
+    }
+  }, [question, answers, correctAnswer, card.uId, onUpdateCard]);
+
 
   const handleAnswerChange = (answerIndex: number, value: string) => {
     const updatedAnswers = [...answers];
@@ -32,10 +38,16 @@ const QuizCard: React.FC<QuizCardProps> = ({ cardIndex, card, onDeleteCard, onUp
     setQuestion(value);
   };
 
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault(); 
+    onDeleteCard();
+  };
+
   return (
     <div className="relative bg-white p-6 rounded-lg shadow-lg mb-4">
       <button
-        onClick={onDeleteCard}
+        type="button" 
+        onClick={handleDeleteClick}
         className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700"
       >
         <i className="fa-solid fa-trash-can">Trash</i>

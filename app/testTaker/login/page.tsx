@@ -12,7 +12,7 @@ export default function Login() {
   const [gameId, setGameId] = useState('');
   const [userName, setUserName] = useState('');
   const { testTakers, addTestTaker, setCurrentUser } = useTestTaker();
-  const { setQuiz } = useQuiz(); 
+  const { setQuiz, quiz } = useQuiz(); 
   const router = useRouter();
 
   const handleStartGame = async () => {
@@ -28,13 +28,14 @@ export default function Login() {
         }
 
         const quizData: Quiz = {
-          id: quizDoc.id.id,
+          id: quizDoc.id,
           db_doc_id: quizDoc.db_doc_id,
           quizName: quizDoc.quizName,
-          card: quizDoc.cards,
+          card: quizDoc.card,
         };
   
         setQuiz(quizData);
+        console.log(quiz, quizData, 'info in quiz')
         const newTestTaker = {
           id: testTakers.length + 1,
           role: 'testtaker' as const,

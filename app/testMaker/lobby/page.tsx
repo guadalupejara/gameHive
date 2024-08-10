@@ -1,3 +1,4 @@
+
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,9 +10,11 @@ import { updateQuiz } from '@/lib';
 
 const Lobby: React.FC = () => {
   const router = useRouter(); 
-  const [gameCode, setgameCode] = useState('');
+  const [gameCode, setGameCode] = useState('');
   const [takers, setTakers] = useState<TestTaker[]>([]);
   const { quiz, setQuiz } = useQuiz();
+  const [isQuizUpdated, setIsQuizUpdated] = useState(false);
+
   const generateUniqueCode = (existingCodes: string[]): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let newCode;
@@ -27,32 +30,33 @@ const Lobby: React.FC = () => {
   };
   
   useEffect(() => {
-   
-    const existingCodes: string[] = []; 
-
+    const existingCodes: string[] = []; // Fetch from database if needed
     const code = generateUniqueCode(existingCodes);
-    setQuiz((prevQuiz) => {
-      if (!prevQuiz) {
-        return {
-          id: code, 
-          db_doc_id:'',
-          quizName: '',
-          card: []
+
+    if (!isQuizUpdated) {
+      setQuiz((prevQuiz) => {
+        const updatedQuiz = {
+          ...prevQuiz,
+          id: code,
+          db_doc_id: prevQuiz?.db_doc_id || '', // Ensure db_doc_id is initialized
+          quizName: prevQuiz?.quizName || '',
+          card: prevQuiz?.card || []
         };
-      }
-      return {
-        ...prevQuiz,
-        id: code
-      };
-    });
-    setgameCode(code)
-    setTakers(testTakers);
-  }, []);
+
+        // Update the quiz in Firestore after the state has been updated
+        updateQuiz(updatedQuiz.db_doc_id, updatedQuiz);
+        
+        return updatedQuiz;
+      });
+
+      setGameCode(code);
+      setTakers(testTakers);
+      setIsQuizUpdated(true); // Ensure the quiz is updated only once
+    }
+  }, [isQuizUpdated, setQuiz]);
 
   const startGame = () => {
     console.log('Starting game with code:', quiz?.id);
-    console.log(quiz)
-    updateQuiz(quiz?.db_doc_id, quiz)
     router.push('/testMaker/game');
   };
 
@@ -63,7 +67,7 @@ const Lobby: React.FC = () => {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">Lobby</h1>
-      <p className="text-lg mb-4">Provide the following Game Code for playes to join the game: <strong className='text-2xl'>{gameCode}</strong></p>
+      <p className="text-lg mb-4">Provide the following Game Code for players to join the game: <strong className='text-2xl'>{gameCode}</strong></p>
       <LobbyBox takers={takers} />
       <div className="mt-4">
         <Button onClick={startGame} label="Start Game" className="mr-2" />
@@ -74,4 +78,3 @@ const Lobby: React.FC = () => {
 };
 
 export default Lobby;
-

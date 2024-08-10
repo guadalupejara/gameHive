@@ -1,15 +1,10 @@
 'use client'
-// import React from 'react'
+import React from 'react'
 import Button from '../app/components/commonComponents/button';
 import { useRouter } from 'next/navigation';
-//
-import React,{ useEffect } from 'react';
-import { uploadData } from '../lib/index';
 
 export default function Home() {
-  useEffect(() => {
-    uploadData();
-  }, []);
+
   const router = useRouter();
   const handleClick = (buttonType: 'testTaker' | 'testMaker') => {
     if (buttonType === 'testTaker') {
@@ -24,7 +19,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-white">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-4">Welcome to QuizHive!</h1>
+        <h1 className="text-3xl font-bold mb-4">Welcome to GameHive!</h1>
         <p className="text-lg">Are you a Test Taker or a Test Maker?</p>
       </div>
 

@@ -1,32 +1,61 @@
-
 'use client';
 
 import React, { useState } from 'react';
 import Button from '@/app/components/commonComponents/button';
 import { useTestTaker } from '@/app/context/testTakerContext';
 import { useRouter } from 'next/navigation';
+import { getQuizByIdProperty,updateTestTakerArr, addTester } from '@/app/../lib/index'; 
+import { useQuiz } from '@/app/context/QuizContext';
+import { Quiz } from '@/app/types/testMaker_types';
 
 export default function Login() {
   const [gameId, setGameId] = useState('');
   const [userName, setUserName] = useState('');
-  const { testTakers, addTestTaker, setCurrentUser} = useTestTaker();
+  const { testTakers, addTestTaker, setCurrentUser } = useTestTaker();
+  const { setQuiz, quiz } = useQuiz(); 
   const router = useRouter();
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (gameId && userName) {
-      const newTestTaker = {
-        id: testTakers.length + 1,
-        role: 'testtaker' as const,
-        name: userName,
-        score: 0,
-      };
-      addTestTaker(newTestTaker);
-      setCurrentUser(newTestTaker);
-      console.log('Test Taker added:', newTestTaker);
-      router.push('/testTaker/lobby'); 
+      try {
+      
+        const quizDoc = await getQuizByIdProperty(gameId);
+        
+        if (!quizDoc) {
+         
+          alert('No quiz found with the provided game ID.');
+          return;
+        }
+
+        const quizData: Quiz = {
+          id: quizDoc.id,
+          db_doc_id: quizDoc.db_doc_id,
+          quizName: quizDoc.quizName,
+          card: quizDoc.card,
+        };
+  
+        setQuiz(quizData);
+        console.log(quiz, quizData, 'info in quiz')
+        const newTestTaker = {
+          id: testTakers.length + 1,
+          role: 'testtaker' as const,
+          name: userName,
+          score: 0,
+        };
+      await updateTestTakerArr(gameId, newTestTaker);
+        addTester(newTestTaker)
+        addTestTaker(newTestTaker);
+        setCurrentUser(newTestTaker);
+        console.log('Test Taker added:', newTestTaker);
+
+        router.push('/testTaker/lobby');
+      } catch (error) {
+        console.error('Error during game start:', error);
+        alert('An error occurred. Please try again.');
+      }
     }
   };
-
+  
   return (
     <main className="flex min-h-screen text-center items-center justify-center p-24">
       <div>
@@ -68,5 +97,3 @@ export default function Login() {
     </main>
   );
 }
-
-

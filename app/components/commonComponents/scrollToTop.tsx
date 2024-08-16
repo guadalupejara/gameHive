@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
-
+  const element = <FontAwesomeIcon icon={faChevronUp} />
   const handleScroll = () => {
     const currentScrollPos = window.pageYOffset;
     setIsVisible(currentScrollPos > 100); //
@@ -30,7 +32,7 @@ const ScrollToTopButton = () => {
       onClick={scrollToTop}
       aria-label="Scroll to top"
     >
-      <i className="fa-solid fa-chevron-up"></i>
+      {element}
     </button>
   );
 };

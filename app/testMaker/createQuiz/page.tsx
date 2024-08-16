@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import React, { useState } from 'react';
 import { useQuiz } from '@/app/context/QuizContext';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,7 @@ const CreateQuiz: React.FC = () => {
       correctAnswer: card.correctAnswer === null,
     }))
   );
+  const [submitted, setSubmitted] = useState(false); // Track form submission status
 
   const defaultError = (uId: string) => ({
     uId,
@@ -110,6 +111,7 @@ const CreateQuiz: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted(true); // Mark the form as submitted
 
     if (validateForm()) {
       try {
@@ -139,10 +141,10 @@ const CreateQuiz: React.FC = () => {
               value={quiz.quizName}
               onChange={(e) => handleUpdateQuizName(e.target.value)}
               className={`w-full md:w-3/4 lg:w-1/2 p-2 border ${
-                errors.some(err => err.uId === 'quiz_name' && err.question) ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                (submitted && errors.some(err => err.uId === 'quiz_name' && err.question)) ? 'border-red-500 bg-red-50' : 'border-gray-300'
               } rounded mb-6`}
             />
-            {errors.some(err => err.uId === 'quiz_name' && err.question) && (
+            {submitted && errors.some(err => err.uId === 'quiz_name' && err.question) && (
               <p className="mt-2 text-sm text-red-600">
                 <span className="font-medium">Oops!</span> Quiz name is required.
               </p>
@@ -153,7 +155,7 @@ const CreateQuiz: React.FC = () => {
                 key={card.uId}
                 cardIndex={cardIndex}
                 card={card}
-                errors={errors.find(err => err.uId === card.uId) || defaultError(card.uId)} 
+                errors={submitted ? (errors.find(err => err.uId === card.uId) || defaultError(card.uId)) : defaultError(card.uId)} 
                 onDeleteCard={() => handleDeleteCard(card.uId)}
                 onUpdateCard={(updatedCard) => handleUpdateCard(card.uId, updatedCard)}
               />
@@ -168,7 +170,7 @@ const CreateQuiz: React.FC = () => {
 
           {/* Render form-wide validation errors */}
           <div className="mb-4">
-            {errors.some(error => error.uId === 'quiz_name' && error.question) && (
+            {submitted && errors.some(error => error.uId === 'quiz_name' && error.question) && (
               <p className="text-red-600 text-sm">
                 <span className="font-medium">Oops!</span> Quiz name is required.
               </p>
@@ -176,7 +178,7 @@ const CreateQuiz: React.FC = () => {
           </div>
 
           {/* Render card-specific validation errors */}
-          {errors.filter(error => error.uId !== 'quiz_name').map((error, index) => (
+          {submitted && errors.filter(error => error.uId !== 'quiz_name').map((error, index) => (
             <div key={index} className="mb-4">
               {error.question && (
                 <p className="text-red-600 text-sm">
@@ -216,4 +218,3 @@ const CreateQuiz: React.FC = () => {
 };
 
 export default CreateQuiz;
-

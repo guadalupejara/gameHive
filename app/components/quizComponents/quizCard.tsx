@@ -1,5 +1,7 @@
 import React from 'react';
 import { Card } from '@/app/types/testMaker_types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons'
 
 interface QuizCardProps {
   cardIndex: number;
@@ -45,7 +47,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
   const handleDeleteClick = () => {
     onDeleteCard();
   };
-
+  const element = <FontAwesomeIcon icon={faTrashCan} />
   return (
     <div className="relative bg-white p-6 rounded-lg shadow-lg mb-4">
       <button
@@ -53,7 +55,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
         onClick={handleDeleteClick}
         className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700"
       >
-        <i className="fa-solid fa-trash-can">Trash</i>
+        {element}
       </button>
       <div className="mb-4">
         <label className="block text-sm font-medium mb-1">Question:</label>

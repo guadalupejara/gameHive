@@ -142,7 +142,7 @@ const CreateQuiz: React.FC = () => {
               onChange={(e) => handleUpdateQuizName(e.target.value)}
               className={`w-full md:w-3/4 lg:w-1/2 p-2 border ${
                 (submitted && errors.some(err => err.uId === 'quiz_name' && err.question)) ? 'border-red-500 bg-red-50' : 'border-gray-300'
-              } rounded mb-6`}
+              } rounded mb-6 text-black`}
             />
             {submitted && errors.some(err => err.uId === 'quiz_name' && err.question) && (
               <p className="mt-2 text-sm text-red-600">

@@ -63,7 +63,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
           type="text"
           value={card.question}
           onChange={(e) => handleQuestionChange(e.target.value)}
-          className={`w-full p-2 border rounded ${
+          className={`w-full p-2 border rounded text-black ${
             errors.question ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="Enter the question"
@@ -85,7 +85,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
             type="text"
             value={answer}
             onChange={(e) => handleAnswerChange(answerIndex, e.target.value)}
-            className={`w-full p-2 border rounded ${
+            className={`w-full p-2 border rounded text-black ${
               errors.answers[answerIndex] ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder={`Answer ${answerIndex + 1}`}

@@ -4,26 +4,25 @@ import React, { useState } from 'react';
 import Button from '@/app/components/commonComponents/button';
 import { useTestTaker } from '@/app/context/testTakerContext';
 import { useRouter } from 'next/navigation';
-import { getQuizByIdProperty,updateTestTakerArr, addTester } from '@/app/../lib/index'; 
+import { getQuizByIdProperty } from '@/lib'; 
 import { useQuiz } from '@/app/context/QuizContext';
 import { Quiz } from '@/app/types/testMaker_types';
+import { tester, TestTaker } from '@/app/types/testTaker_types';
 
 export default function Login() {
   const [gameId, setGameId] = useState('');
   const [userName, setUserName] = useState('');
-  const { testTakers, addTestTaker, setCurrentUser } = useTestTaker();
-  const { setQuiz, quiz } = useQuiz(); 
+  const { testTaker, addTestTaker, setCurrentUser } = useTestTaker();
+  const { setQuiz } = useQuiz(); 
   const router = useRouter();
 
   const handleStartGame = async () => {
     if (gameId && userName) {
       try {
-      
         const quizDoc = await getQuizByIdProperty(gameId);
         
         if (!quizDoc) {
-         
-          alert('No quiz found with the provided game ID.');
+          alert('No quiz found with the provided game ID. From Login FE');
           return;
         }
 
@@ -33,21 +32,42 @@ export default function Login() {
           quizName: quizDoc.quizName,
           card: quizDoc.card,
         };
-  
+
         setQuiz(quizData);
-        console.log(quiz, quizData, 'info in quiz')
-        const newTestTaker = {
-          id: testTakers.length + 1,
-          role: 'testtaker' as const,
+        console.log(quizData, 'info in quiz');
+
+        // Generate a unique ID for the new tester based on the gameId and existing testers
+        const newTesterId = (testTaker ? testTaker.tester.length : 0) + 1;
+
+        const newTester: tester = {
+          id: newTesterId, // Use gameId as prefix with an index
+          role: 'testtaker',
           name: userName,
           score: 0,
         };
-      await updateTestTakerArr(gameId, newTestTaker);
-        addTester(newTestTaker)
-        addTestTaker(newTestTaker);
-        setCurrentUser(newTestTaker);
-        console.log('Test Taker added:', newTestTaker);
 
+        // Update or create the test taker object
+        if (testTaker) {
+          const updatedTestTaker: TestTaker = {
+            ...testTaker,
+            tester: [...testTaker.tester, newTester],
+          };
+          addTestTaker(updatedTestTaker);
+        } else {
+          const initialTestTaker: TestTaker = {
+            id: gameId, // Use gameId as the ID for the TestTaker
+            tester: [newTester],
+          };
+          addTestTaker(initialTestTaker);
+        }
+
+        // Set the current user
+        setCurrentUser({
+          id: gameId,
+          tester: [newTester],
+        });
+
+        console.log('Test Taker added:', newTester);
         router.push('/testTaker/lobby');
       } catch (error) {
         console.error('Error during game start:', error);

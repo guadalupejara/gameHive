@@ -1,7 +1,7 @@
-'use client';
+'use client'
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface TestTaker {
+interface Tester {
   id: number;
   role: 'testtaker';
   name: string;
@@ -9,39 +9,28 @@ interface TestTaker {
 }
 
 interface TestTakerContextProps {
-  testTakers: TestTaker[];
-  addTestTaker: (testTaker: TestTaker) => void;
+  testTakers: Tester[]; // Change to an array
+  addTestTaker: (testTaker: Tester) => void;
   updateTestTakerScore: (id: number, newScore: number) => void;
-  currentUser: TestTaker | null;
-  setCurrentUser: (testTaker: TestTaker) => void;
-  setTestTakers:(testTaker: TestTaker[])=> void;
 }
 
 const TestTakerContext = createContext<TestTakerContextProps | undefined>(undefined);
 
 export const TestTakerProvider = ({ children }: { children: ReactNode }) => {
-  const [testTakers, setTestTakers] = useState<TestTaker[]>([]);
-  const [currentUser, setCurrentUser] = useState<TestTaker | null>(null);
+  const [testTakers, setTestTakers] = useState<Tester[]>([]); // Change to array
 
-  const addTestTaker = (testTaker: TestTaker) => {
-    setTestTakers((prevTestTakers) => [...prevTestTakers, testTaker]);
+  const addTestTaker = (newTestTaker: Tester) => {
+    setTestTakers((prev) => [...prev, newTestTaker]); // Append new test taker
   };
 
   const updateTestTakerScore = (id: number, newScore: number) => {
-    setTestTakers((prevTestTakers) => 
-      prevTestTakers.map((taker) =>
-        taker.id === id ? { ...taker, score: newScore } : taker
-      )
+    setTestTakers((prev) =>
+      prev.map((taker) => (taker.id === id ? { ...taker, score: newScore } : taker))
     );
-    if (currentUser?.id === id) {
-      setCurrentUser((prevUser) =>
-        prevUser ? { ...prevUser, score: newScore } : prevUser
-      );
-    }
   };
 
   return (
-    <TestTakerContext.Provider value={{ testTakers, addTestTaker, updateTestTakerScore, currentUser, setCurrentUser, setTestTakers }}>
+    <TestTakerContext.Provider value={{ testTakers, addTestTaker, updateTestTakerScore }}>
       {children}
     </TestTakerContext.Provider>
   );

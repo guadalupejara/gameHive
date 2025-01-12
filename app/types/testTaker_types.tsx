@@ -1,6 +1,9 @@
  export interface TestTaker {
-    id: number;
+    id: string;
+    tester: tester[];
+  }
+ export interface tester{  id: number;
     role: 'testtaker';
     name: string;
-    score: number;
-  }
+    score: number;}
+

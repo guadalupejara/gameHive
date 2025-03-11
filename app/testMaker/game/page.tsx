@@ -145,9 +145,13 @@ const Game: React.FC = () => {
 
   const handleTimerEnd = () => {
     if (testTakers) {
-      testTakers.forEach(tester => {
-        // Placeholder: Update scores based on your logic
-        updateTestTakerScore(tester.id, tester.score + 10); // Example logic
+      testTakers.forEach(taker => {
+        // Assuming there's only one tester in taker.tester, if there's more than one, you should adjust the logic accordingly.
+        const tester = taker.tester[0]; // Access the first tester in the array (adjust if needed)
+        if (tester) {
+          // Now you can safely access tester.score
+          updateTestTakerScore(Number(tester.id), tester.score + 10); // Example logic
+        }
       });
     }
   };
@@ -167,17 +171,18 @@ const Game: React.FC = () => {
 
   const labels = useMemo(() => {
     if (testTakers && Array.isArray(testTakers)) {
-      return testTakers.map(taker => taker.name);
+      return testTakers.map(taker => taker.tester[0]?.name || 'Unknown'); // Assuming there's at least one tester in the array
     }
     return [];
   }, [testTakers]);
-
+  
   const data = useMemo(() => {
     if (testTakers && Array.isArray(testTakers)) {
-      return testTakers.map(taker => taker.score);
+      return testTakers.map(taker => taker.tester[0]?.score || 0); // Assuming there's at least one tester in the array
     }
     return [];
   }, [testTakers]);
+  
 
   return (
     <main className="p-4">

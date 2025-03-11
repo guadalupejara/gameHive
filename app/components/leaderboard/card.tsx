@@ -2,15 +2,15 @@
 import React from 'react';
 import { useState } from 'react';
 import LeaderboardRows from './leaderboardRows'
-import {testTakers, TestTaker} from '../../data/testTakers'
+import {testTakers} from '../../data/testTakers'
 
 const Card = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [participants, setParticipants]= useState<TestTaker[]>(testTakers);
+ 
+  const [participants]= useState(testTakers.tester);
 
-  const sortMachine = (a: TestTaker, b: TestTaker) => {
+  const sortMachine = (a: { score: number }, b: { score: number }) => {
     return b.score - a.score;
-  }
+  };
 
   participants.sort(sortMachine);
 

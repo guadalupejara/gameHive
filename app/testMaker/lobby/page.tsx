@@ -6,7 +6,7 @@ import LobbyBox from '@/app/components/commonComponents/lobbyBox';
 import { useQuiz } from '@/app/context/QuizContext';
 import { updateQuiz, listenToTestTakers, getQuizCodes, addQuizCode, addToggleGame, updateToggleGame } from '@/lib';
 import { useTestTaker } from '@/app/context/testTakerContext';
-import { tester } from '@/app/types/testTaker_types';
+import { tester, TestTaker } from '@/app/types/testTaker_types';
 
 const Lobby: React.FC = () => {
   const router = useRouter();
@@ -79,22 +79,45 @@ const Lobby: React.FC = () => {
     }
   }, [isQuizUpdated, quiz?.id, toggleCreated]);
 
+  // useEffect(() => {
+  //   if (quiz?.id) {
+  //     const unsubscribe = listenToTestTakers(quiz.id, (updatedTestTakers: tester[]) => {
+  //       updatedTestTakers.forEach(tester => {
+  //         // Check if the tester already exists
+  //         if (!testTakers.some(existingTaker => existingTaker.id === tester.id)) {
+  //           addTestTaker(tester); // Only add if it doesn't exist
+  //         }
+  //       });
+  //     });
+
+  //     return () => {
+  //       unsubscribe();
+  //     };
+  //   }
+  // }, [quiz?.id, addTestTaker, testTakers]); // Add testTakers as a dependency
   useEffect(() => {
     if (quiz?.id) {
       const unsubscribe = listenToTestTakers(quiz.id, (updatedTestTakers: tester[]) => {
         updatedTestTakers.forEach(tester => {
           // Check if the tester already exists
-          if (!testTakers.some(existingTaker => existingTaker.id === tester.id)) {
-            addTestTaker(tester); // Only add if it doesn't exist
+          if (!testTakers.some(existingTaker => Number(existingTaker.id) === tester.id)) {
+            // Wrap the tester object in an array and create a TestTaker object
+            const newTestTaker: TestTaker = {
+              id: String(tester.id),  // Convert tester.id to a string as required by the TestTaker interface
+              tester: [tester], // Wrap tester in an array
+            };
+            addTestTaker(newTestTaker); // Only add if it doesn't exist
           }
         });
       });
-
+  
       return () => {
         unsubscribe();
       };
     }
-  }, [quiz?.id, addTestTaker, testTakers]); // Add testTakers as a dependency
+  }, [quiz?.id, addTestTaker, testTakers]);
+  
+  
 
   const startGame = () => {
     const updatedToggleData = { gameId: quiz?.id, is_Quiz_Done: false, is_Ready_For_Next_Page: false, is_game_active: true };
@@ -105,12 +128,12 @@ const Lobby: React.FC = () => {
   const cancelGame = () => {
     router.push('/testMaker/dashboard');
   };
-
+  const flatTesters = testTakers.flatMap(taker => taker.tester);
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">Lobby</h1>
       <p className="text-lg mb-4">Provide the following Game Code for players to join the game: <strong className='text-2xl'>{gameCode}</strong></p>
-      <LobbyBox takers={testTakers} />
+      <LobbyBox takers={flatTesters} />
       <div className="mt-4">
         <Button onClick={startGame} label="Start Game" className="mr-2" />
         <Button onClick={cancelGame} label="Cancel" className="bg-gray-300" />

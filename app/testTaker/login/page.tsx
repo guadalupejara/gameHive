@@ -1,3 +1,122 @@
+// 'use client';
+
+// import React, { useState } from 'react';
+// import Button from '@/app/components/commonComponents/button';
+// import { useTestTaker } from '@/app/context/testTakerContext';
+// import { useRouter } from 'next/navigation';
+// import { getQuizByIdProperty } from '@/lib'; 
+// import { useQuiz } from '@/app/context/QuizContext';
+// import { Quiz } from '@/app/types/testMaker_types';
+// import { tester, TestTaker } from '@/app/types/testTaker_types';
+
+// export default function Login() {
+//   const [gameId, setGameId] = useState('');
+//   const [userName, setUserName] = useState('');
+//   const { testTaker, addTestTaker, setCurrentUser } = useTestTaker();
+//   const { setQuiz } = useQuiz(); 
+//   const router = useRouter();
+
+//   const handleStartGame = async () => {
+//     if (gameId && userName) {
+//       try {
+//         const quizDoc = await getQuizByIdProperty(gameId);
+        
+//         if (!quizDoc) {
+//           alert('No quiz found with the provided game ID. From Login FE');
+//           return;
+//         }
+
+//         const quizData: Quiz = {
+//           id: quizDoc.id,
+//           db_doc_id: quizDoc.db_doc_id,
+//           quizName: quizDoc.quizName,
+//           card: quizDoc.card,
+//         };
+
+//         setQuiz(quizData);
+//         console.log(quizData, 'info in quiz');
+
+//         // Generate a unique ID for the new tester based on the gameId and existing testers
+//         const newTesterId = (testTaker ? testTaker.tester.length : 0) + 1;
+
+//         const newTester: tester = {
+//           id: newTesterId, // Use gameId as prefix with an index
+//           role: 'testtaker',
+//           name: userName,
+//           score: 0,
+//         };
+
+//         // Update or create the test taker object
+//         if (testTaker) {
+//           const updatedTestTaker: TestTaker = {
+//             ...testTaker,
+//             tester: [...testTaker.tester, newTester],
+//           };
+//           addTestTaker(updatedTestTaker);
+//         } else {
+//           const initialTestTaker: TestTaker = {
+//             id: gameId, // Use gameId as the ID for the TestTaker
+//             tester: [newTester],
+//           };
+//           addTestTaker(initialTestTaker);
+//         }
+
+//         // Set the current user
+//         setCurrentUser({
+//           id: gameId,
+//           tester: [newTester],
+//         });
+
+//         console.log('Test Taker added:', newTester);
+//         router.push('/testTaker/lobby');
+//       } catch (error) {
+//         console.error('Error during game start:', error);
+//         alert('An error occurred. Please try again.');
+//       }
+//     }
+//   };
+  
+//   return (
+//     <main className="flex min-h-screen text-center items-center justify-center p-24">
+//       <div>
+//         <h1 className="text-4xl font-bold">Test Taker Login</h1>
+//         <div className='mb-9 p-6'>
+//           <p>To start a game, input the code & choose a user name. Be aware that the Test Maker will only see the name you have chosen.</p>
+//           <label className="block text-lg font-medium mt-6 mb-2">Game Id:</label>
+//           <input
+//             type="text"
+//             value={gameId}
+//             onChange={(e) => setGameId(e.target.value)}
+//             className="w-1/3 p-2 border border-gray-300 rounded mb-6"
+//           />
+//           <label className="block text-lg font-medium mt-6 mb-2">User Name:</label>
+//           <input
+//             type="text"
+//             value={userName}
+//             onChange={(e) => setUserName(e.target.value)}
+//             className="w-1/3 p-2 border border-gray-300 rounded mb-6"
+//           />
+//           <div className='flex flex-container justify-center'>
+//             <Button
+//               label="Start Game"
+//               onClick={handleStartGame}
+//               className="bg-blue-400 hover:bg-blue-500 mt-3 ml-3"
+//               disabled={!gameId || !userName}
+//             />
+//             <Button
+//               label="Cancel"
+//               onClick={() => {
+//                 setGameId('');
+//                 setUserName('');
+//               }}
+//               className="bg-gray-500 hover:bg-gray-600 mt-3 ml-3"
+//             />
+//           </div>
+//         </div>
+//       </div>
+//     </main>
+//   );
+// }
 'use client';
 
 import React, { useState } from 'react';
@@ -12,7 +131,7 @@ import { tester, TestTaker } from '@/app/types/testTaker_types';
 export default function Login() {
   const [gameId, setGameId] = useState('');
   const [userName, setUserName] = useState('');
-  const { testTaker, addTestTaker, setCurrentUser } = useTestTaker();
+  const { addTestTaker, setCurrentUser } = useTestTaker();  // Access context functions
   const { setQuiz } = useQuiz(); 
   const router = useRouter();
 
@@ -22,7 +141,7 @@ export default function Login() {
         const quizDoc = await getQuizByIdProperty(gameId);
         
         if (!quizDoc) {
-          alert('No quiz found with the provided game ID. From Login FE');
+          alert('No quiz found with the provided game ID.');
           return;
         }
 
@@ -34,40 +153,27 @@ export default function Login() {
         };
 
         setQuiz(quizData);
-        console.log(quizData, 'info in quiz');
 
-        // Generate a unique ID for the new tester based on the gameId and existing testers
-        const newTesterId = (testTaker ? testTaker.tester.length : 0) + 1;
-
+        // Create new tester
+        const newTesterId = 1;  // Add logic to create unique IDs
         const newTester: tester = {
-          id: newTesterId, // Use gameId as prefix with an index
+          id: newTesterId,
           role: 'testtaker',
           name: userName,
           score: 0,
         };
 
-        // Update or create the test taker object
-        if (testTaker) {
-          const updatedTestTaker: TestTaker = {
-            ...testTaker,
-            tester: [...testTaker.tester, newTester],
-          };
-          addTestTaker(updatedTestTaker);
-        } else {
-          const initialTestTaker: TestTaker = {
-            id: gameId, // Use gameId as the ID for the TestTaker
-            tester: [newTester],
-          };
-          addTestTaker(initialTestTaker);
-        }
-
-        // Set the current user
-        setCurrentUser({
+        const newTestTaker: TestTaker = {
           id: gameId,
           tester: [newTester],
-        });
+        };
 
-        console.log('Test Taker added:', newTester);
+        // Add test taker to context
+        addTestTaker(newTestTaker);
+
+        // Set the current user in context
+        setCurrentUser(newTestTaker);
+
         router.push('/testTaker/lobby');
       } catch (error) {
         console.error('Error during game start:', error);
@@ -75,7 +181,7 @@ export default function Login() {
       }
     }
   };
-  
+
   return (
     <main className="flex min-h-screen text-center items-center justify-center p-24">
       <div>
@@ -102,14 +208,6 @@ export default function Login() {
               onClick={handleStartGame}
               className="bg-blue-400 hover:bg-blue-500 mt-3 ml-3"
               disabled={!gameId || !userName}
-            />
-            <Button
-              label="Cancel"
-              onClick={() => {
-                setGameId('');
-                setUserName('');
-              }}
-              className="bg-gray-500 hover:bg-gray-600 mt-3 ml-3"
             />
           </div>
         </div>

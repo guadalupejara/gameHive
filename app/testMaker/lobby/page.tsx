@@ -1,114 +1,62 @@
-'use client';
 
+'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { testTakers, TestTaker } from '@/app/data/testTakers';
 import Button from '@/app/components/commonComponents/button';
 import LobbyBox from '@/app/components/commonComponents/lobbyBox';
 import { useQuiz } from '@/app/context/QuizContext';
-import { updateQuiz, listenToTestTakers, getQuizCodes, addQuizCode, addToggleGame, updateToggleGame } from '@/lib';
-import { TestTaker } from '@/app/types/testTaker_types';
+import { updateQuiz } from '@/lib';
 
 const Lobby: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter(); 
   const [gameCode, setGameCode] = useState('');
   const [takers, setTakers] = useState<TestTaker[]>([]);
   const { quiz, setQuiz } = useQuiz();
   const [isQuizUpdated, setIsQuizUpdated] = useState(false);
-  const [existingCodes, setExistingCodes] = useState<string[]>([]);
-  const [toggleCreated, setToggleCreated] = useState(false);
 
-  useEffect(() => {
-    const fetchExistingCodes = async () => {
-      try {
-        const codes = await getQuizCodes(); 
-        setExistingCodes(codes);
-        console.log('Existing quiz codes:', codes);
-      } catch (error) {
-        console.error('Error fetching quiz codes:', error);
+  const generateUniqueCode = (existingCodes: string[]): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let newCode;
+  
+    do {
+      newCode = '';
+      for (let i = 0; i < 4; i++) {
+        newCode += chars[Math.floor(Math.random() * chars.length)];
       }
-    };
-
-    fetchExistingCodes();
-  }, []);
-
+    } while (existingCodes.includes(newCode));
+  
+    return newCode;
+  };
+  
   useEffect(() => {
+    const existingCodes: string[] = []; // Fetch from database if needed
+    const code = generateUniqueCode(existingCodes);
+
     if (!isQuizUpdated) {
-      console.log("isQuizUpdated touched", isQuizUpdated);
-
-      const generateUniqueCode = (existingCodes: string[]): string => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let newCode;
-
-        do {
-          newCode = '';
-          for (let i = 0; i < 4; i++) {
-            newCode += chars[Math.floor(Math.random() * chars.length)];
-          }
-        } while (existingCodes.includes(newCode));
-
-        return newCode;
-      };
-
-      const code = generateUniqueCode(existingCodes);
-
       setQuiz((prevQuiz) => {
         const updatedQuiz = {
           ...prevQuiz,
           id: code,
-          db_doc_id: prevQuiz?.db_doc_id || '',
+          db_doc_id: prevQuiz?.db_doc_id || '', // Ensure db_doc_id is initialized
           quizName: prevQuiz?.quizName || '',
           card: prevQuiz?.card || []
         };
 
+        // Update the quiz in Firestore after the state has been updated
         updateQuiz(updatedQuiz.db_doc_id, updatedQuiz);
-
-        setGameCode(code);
-        setIsQuizUpdated(true);
-
+        
         return updatedQuiz;
       });
+
+      setGameCode(code);
+      setTakers(testTakers);
+      setIsQuizUpdated(true); // Ensure the quiz is updated only once
     }
-  }, [isQuizUpdated, existingCodes, setQuiz]);
-
-  useEffect(() => {
-    if (isQuizUpdated && quiz?.id) {
-      addQuizCode(quiz.id)
-        .catch((error) => {
-          console.error('Error adding quiz code:', error);
-        });
-
-      if (!toggleCreated) {
-        const toggleData = { gameId: quiz.id, is_game_active: false };
-
-        addToggleGame(toggleData)
-          .then(() => {
-            setToggleCreated(true); 
-            console.log("Adding toggle success");
-          })
-          .catch((error) => {
-            console.error('Error adding toggle game:', error);
-          });
-      }
-    }
-  }, [isQuizUpdated, quiz?.id, toggleCreated]);
-
-  useEffect(() => {
-    if (quiz?.id) {
-      const unsubscribe = listenToTestTakers(quiz.id, (updatedTesters: TestTaker[]) => {
-        setTakers(updatedTesters);
-      });
-
-      return () => {
-        unsubscribe();
-      };
-    }
-  }, [quiz?.id]);
+  }, [isQuizUpdated, setQuiz]);
 
   const startGame = () => {
     console.log('Starting game with code:', quiz?.id);
-    // Update toggle to true
-    const updatedToggleData = { gameId: quiz?.id, is_game_active: true };
-    updateToggleGame(quiz?.id, updatedToggleData);
     router.push('/testMaker/game');
   };
 
